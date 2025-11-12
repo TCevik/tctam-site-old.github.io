@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html lang="nl">
+
 <head>
     <meta charset="UTF-8">
     <title>IDE</title>
 
     <link rel="stylesheet" href="/style.css">
     <script src="/script.js"></script>
-    
+
 
     <style>
         #embedFrame {
@@ -63,12 +64,14 @@
         }
     </script>
 </head>
+
 <body onload="updateEmbed()">
-    
+
     <h1>IDE</h1>
     <p>Enter code and admire your achievement</p>
 
-    <textarea id="html-code" rows="25" style="width: 90%;" placeholder="Type your HTML code here..." oninput="updateEmbed(), highlightCode()">
+    <textarea id="html-code" rows="25" style="width: 90%;" placeholder="Type your HTML code here..."
+        oninput="updateEmbed(), highlightCode()">
 <!DOCTYPE html>
 <html lang="nl">
 <head>
@@ -85,8 +88,20 @@
         <br>[Word word word. Word word word. Word word word.]</p></body>
 </html>
     </textarea>
+
+    <!-- Display Advertisement Start  -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8924607946192862"
+        crossorigin="anonymous"></script>
+    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-8924607946192862" data-ad-slot="5862330293"
+        data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+    <!-- Advertisement End -->
+
     <button id="fullscreenButton" onclick="toggleFullscreen()">Full screen</button>
 
     <iframe id="embedFrame" srcdoc="" frameborder="0"></iframe>
 </body>
+
 </html>

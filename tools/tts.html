@@ -24,6 +24,16 @@
   <br><button id="read-button" onclick="readText();">Read aloud</button>
   <button id="speak-button" onclick="startRecording();">Speak in</button>
 
+  <!-- Display Advertisement Start  -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8924607946192862"
+    crossorigin="anonymous"></script>
+  <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-8924607946192862" data-ad-slot="5862330293"
+    data-ad-format="auto" data-full-width-responsive="true"></ins>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+  <!-- Advertisement End -->
+
   <audio id="speak-sound" src="/assets/google-now-voice.mp3"></audio>
 
   <script>
@@ -32,7 +42,7 @@
     function readText() {
       var text = document.getElementById("text-to-read").value;
       var speech = new SpeechSynthesisUtterance(text);
-      speech.lang = 'nl-NL'; 
+      speech.lang = 'nl-NL';
       var button = document.getElementById("read-button");
       var buttonSpeak = document.getElementById("speak-button");
       button.disabled = true; // Deactiveer de knop
@@ -68,7 +78,7 @@
       buttonSpeak.innerText = 'Listening...';
       playSound(); // Speel het geluid af
     }
-    
+
     function playSound() {
       var audio = document.getElementById("speak-sound");
       audio.play();
