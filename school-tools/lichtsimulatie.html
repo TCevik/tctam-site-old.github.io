@@ -36,6 +36,8 @@
             <option value="spiegel">Spiegel</option>
             <option value="laser">Laser</option>
         </select>
+
+        <br><button onclick="window.location.reload()">Maak Leeg</button>
     </div>
     <script>
         // Haal de <select> en de waarde op
@@ -256,7 +258,7 @@
 
                         // Check na de lus of de rand is bereikt
                         if (reflections >= maxReflections) {
-                            notification("De laser heeft de rand niet bereikt na 250.000 reflecties.");
+                            notification("ONGELDIG: De laser heeft de rand niet bereikt na 250.000 reflecties.");
                         }
                     }
                     drawGrid(); // Herteken het raster na het toevoegen van de lijn
