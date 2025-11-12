@@ -32,21 +32,30 @@
         <p id="reflectionCount">Aantal reflecties:</p>
         <button id="undoButton">Undo</button>
 
-        <select id="typeLine">
-            <option value="spiegel">Spiegel</option>
-            <option value="laser">Laser</option>
-        </select>
+        <div id="typeLineOptions">
+            <label>
+                <input type="radio" name="typeLine" value="spiegel" checked>
+                Spiegel
+            </label>
+            <br><label style="margin-left: 10px;">
+                <input type="radio" name="typeLine" value="laser">
+                Laser
+            </label>
+        </div>
 
         <br>
         <br><button onclick="window.location.reload()">Maak Leeg</button>
     </div>
     <script>
-        // Haal de <select> en de waarde op
-        const selectElement = document.getElementById("typeLine");
-        let typeLine = selectElement.value;  // Zet de waarde van de geselecteerde optie
-        selectElement.addEventListener("change", (event) => {
-            typeLine = event.target.value;  // Update de waarde van typeLine
-            notification('Je maakt nu een ' + typeLine + '.');  // Laat de nieuwe waarde zien in de console
+        let typeLine = "spiegel"; // standaardwaarde
+
+        // Luister naar veranderingen bij de radiobuttons
+        const radioButtons = document.querySelectorAll('input[name="typeLine"]');
+        radioButtons.forEach(radio => {
+            radio.addEventListener("change", (event) => {
+                typeLine = event.target.value;
+                notification('Je maakt nu een ' + typeLine + '.');
+            });
         });
 
         // Selecteer het canvas en verkrijg de 2D-context
@@ -151,8 +160,37 @@
                 } else {
                     // Tweede punt selecteren en lijn toevoegen
                     if (currentPoint !== clickedDot) {
-                        lines.push({ start: currentPoint, end: clickedDot, color: "#000" });
-                        currentPoint = clickedDot; // Update het beginpunt naar het eindpunt van deze lijn
+                        const newLine = { start: currentPoint, end: clickedDot, color: "#000" };
+                        let intersects = false;
+
+                        // Controleer of de nieuwe lijn een bestaande spiegel kruist
+                        for (const line of lines) {
+                            if (line.color === "#000") {
+                                const intersection = findIntersection(
+                                    newLine.start, newLine.end,
+                                    line.start, line.end
+                                );
+
+                                // Check of het geen gedeeld eindpunt is (dat mag wél)
+                                if (intersection && !(
+                                    (intersection.x === newLine.start.x && intersection.y === newLine.start.y) ||
+                                    (intersection.x === newLine.end.x && intersection.y === newLine.end.y) ||
+                                    (intersection.x === line.start.x && intersection.y === line.start.y) ||
+                                    (intersection.x === line.end.x && intersection.y === line.end.y)
+                                )) {
+                                    intersects = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (intersects) {
+                            notification("❌ Spiegels mogen elkaar niet snijden!");
+                        } else {
+                            // Geen kruising — lijn toevoegen
+                            lines.push(newLine);
+                            currentPoint = clickedDot; // Update het beginpunt naar het eindpunt
+                        }
                     }
                     drawGrid(); // Herteken het raster na het toevoegen van de lijn
                 }
@@ -177,7 +215,7 @@
                         dy /= length;
 
                         let reflections = 0;
-                        const maxReflections = 250000; // Voorkom oneindige lussen
+                        const maxReflections = 500000; // Voorkom oneindige lussen
                         laserLines.length = 0;
 
                         let lastHitLine = null; // Houd bij welke lijn de laser als laatst heeft geraakt
@@ -259,7 +297,7 @@
 
                         // Check na de lus of de rand is bereikt
                         if (reflections >= maxReflections) {
-                            notification("ONGELDIG: De laser heeft de rand niet bereikt na 250.000 reflecties.");
+                            notification("ONGELDIG: De laser heeft de rand niet bereikt na 500.000 reflecties.");
                         }
                     }
                     drawGrid(); // Herteken het raster na het toevoegen van de lijn
