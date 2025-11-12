@@ -215,7 +215,7 @@
                         dy /= length;
 
                         let reflections = 0;
-                        const maxReflections = 500000; // Voorkom oneindige lussen
+                        const maxReflections = 250000; // Voorkom oneindige lussen
                         laserLines.length = 0;
 
                         let lastHitLine = null; // Houd bij welke lijn de laser als laatst heeft geraakt
@@ -297,7 +297,7 @@
 
                         // Check na de lus of de rand is bereikt
                         if (reflections >= maxReflections) {
-                            notification("ONGELDIG: De laser heeft de rand niet bereikt na 500.000 reflecties.");
+                            notification("ONGELDIG: De laser heeft de rand niet bereikt na 250.000 reflecties.");
                         }
                     }
                     drawGrid(); // Herteken het raster na het toevoegen van de lijn
