@@ -47,9 +47,8 @@
         <br><button onclick="window.location.reload()">Maak Leeg</button>
     </div>
     <script>
-        let typeLine = "spiegel"; // standaardwaarde
+        let typeLine = "spiegel";
 
-        // Luister naar veranderingen bij de radiobuttons
         const radioButtons = document.querySelectorAll('input[name="typeLine"]');
         radioButtons.forEach(radio => {
             radio.addEventListener("change", (event) => {
@@ -58,29 +57,24 @@
             });
         });
 
-        // Selecteer het canvas en verkrijg de 2D-context
         const canvas = document.getElementById("dotsCanvas");
         const ctx = canvas.getContext("2d");
         const undoButton = document.getElementById("undoButton");
 
-        // Configuratie van het raster
-        const gridSize = 30; // Aantal stippen in het raster (een vierkant)
-        const dotRadius = 5; // Straal van elke stip
-        const margin = 10; // Ruimte langs de randen
+        const gridSize = 30;
+        const dotRadius = 5;
+        const margin = 10;
 
-        // Arrays voor stippenlocaties, geselecteerde stippen en lijnen
         const dots = [];
         const selectedDots = [];
-        const lines = []; // Opslag voor getekende lijnen
-        const laserLines = []; // Opslag voor getekende lasers
+        const lines = [];
+        const laserLines = [];
 
-        // Bereken de spacing op basis van het aantal stippen en de beschikbare ruimte
         const spacing = (canvas.width - 2 * margin) / (gridSize - 1);
 
         function drawGrid() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Teken de stippen en geselecteerde stippen
             for (const dot of dots) {
                 ctx.beginPath();
                 ctx.arc(dot.x, dot.y, dotRadius, 0, Math.PI * 2);
@@ -89,9 +83,8 @@
                 ctx.closePath();
             }
 
-            // Teken eerst alle spiegel-lijnen (zwart)
             for (const line of lines) {
-                if (line.color === "#000") { // Alleen de spiegel-lijnen
+                if (line.color === "#000") {
                     ctx.beginPath();
                     ctx.moveTo(line.start.x, line.start.y);
                     ctx.lineTo(line.end.x, line.end.y);
@@ -102,13 +95,12 @@
                 }
             }
 
-            // Teken daarna de andere lijnen (bijvoorbeeld lasers)
             for (const line of laserLines) {
-                if (line.color !== "#000") { // Andere lijnen, zoals lasers
+                if (line.color !== "#000") {
                     ctx.beginPath();
                     ctx.moveTo(line.start.x, line.start.y);
                     ctx.lineTo(line.end.x, line.end.y);
-                    ctx.strokeStyle = line.color || "red"; // Zorg ervoor dat de lasers de juiste kleur hebben
+                    ctx.strokeStyle = line.color || "red";
                     ctx.lineWidth = 1.5;
                     ctx.stroke();
                     ctx.closePath();
@@ -124,7 +116,6 @@
             }
         }
 
-        // Initializeer de stippen in het raster
         for (let i = 0; i < gridSize; i++) {
             for (let j = 0; j < gridSize; j++) {
                 const x = margin + i * spacing;
@@ -142,28 +133,22 @@
             const mouseX = event.clientX - rect.left;
             const mouseY = event.clientY - rect.top;
 
-            // Vind de dichtstbijzijnde stip
             const clickedDot = dots.find(dot => {
                 const dx = dot.x - mouseX;
                 const dy = dot.y - mouseY;
                 return Math.sqrt(dx * dx + dy * dy) <= dotRadius * 2.5;
             });
 
-            // Als er geen geldig punt is aangeklikt, stop
             if (!clickedDot) return;
 
             if (typeLine === "spiegel") {
-                // Automatisch doorlopende lijnen voor spiegels
                 if (!currentPoint) {
-                    // Eerste punt selecteren
                     currentPoint = clickedDot;
                 } else {
-                    // Tweede punt selecteren en lijn toevoegen
                     if (currentPoint !== clickedDot) {
                         const newLine = { start: currentPoint, end: clickedDot, color: "#000" };
                         let intersects = false;
 
-                        // Controleer of de nieuwe lijn een bestaande spiegel kruist
                         for (const line of lines) {
                             if (line.color === "#000") {
                                 const intersection = findIntersection(
@@ -171,7 +156,6 @@
                                     line.start, line.end
                                 );
 
-                                // Check of het geen gedeeld eindpunt is (dat mag wél)
                                 if (intersection && !(
                                     (intersection.x === newLine.start.x && intersection.y === newLine.start.y) ||
                                     (intersection.x === newLine.end.x && intersection.y === newLine.end.y) ||
@@ -187,15 +171,13 @@
                         if (intersects) {
                             notification("❌ Spiegels mogen elkaar niet snijden!");
                         } else {
-                            // Geen kruising — lijn toevoegen
                             lines.push(newLine);
-                            currentPoint = clickedDot; // Update het beginpunt naar het eindpunt
+                            currentPoint = clickedDot;
                         }
                     }
-                    drawGrid(); // Herteken het raster na het toevoegen van de lijn
+                    drawGrid();
                 }
             } else if (typeLine === "laser") {
-                // Handmatige selectie voor laser
                 const alreadySelected = selectedDots.some(dot => dot.x === clickedDot.x && dot.y === clickedDot.y);
 
                 if (!alreadySelected) {
@@ -207,7 +189,6 @@
                         let currentX = dot1.x;
                         let currentY = dot1.y;
 
-                        // Beginrichtingsvector van de laser
                         let dx = dot2.x - dot1.x;
                         let dy = dot2.y - dot1.y;
                         const length = Math.sqrt(dx ** 2 + dy ** 2);
@@ -215,19 +196,18 @@
                         dy /= length;
 
                         let reflections = 0;
-                        const maxReflections = 250000; // Voorkom oneindige lussen
+                        const maxReflections = 250000;
                         laserLines.length = 0;
 
-                        let lastHitLine = null; // Houd bij welke lijn de laser als laatst heeft geraakt
+                        let lastHitLine = null;
 
                         while (reflections < maxReflections) {
                             let closestIntersection = null;
                             let closestLine = null;
                             let minDistance = Infinity;
 
-                            // Zoek het dichtstbijzijnde snijpunt
                             for (const line of lines) {
-                                if (line.color === "#000" && line !== lastHitLine) { // Alleen spiegels en geen herhaling
+                                if (line.color === "#000" && line !== lastHitLine) {
                                     const intersection = findIntersection(
                                         { x: currentX, y: currentY },
                                         { x: currentX + dx * 1000, y: currentY + dy * 1000 },
@@ -251,27 +231,23 @@
                             }
 
                             if (closestIntersection) {
-                                // Teken de laserstraal tot het dichtstbijzijnde snijpunt
                                 laserLines.push({
                                     start: { x: currentX, y: currentY },
                                     end: closestIntersection,
                                     color: "red"
                                 });
 
-                                // Bereken de normale vector van de spiegel
                                 const normal = {
                                     x: closestLine.end.y - closestLine.start.y,
                                     y: closestLine.start.x - closestLine.end.x
                                 };
 
-                                // Bereken de reflectierichting
                                 const reflection = calculateReflection(
                                     { x: currentX, y: currentY },
                                     closestIntersection,
                                     normal
                                 );
 
-                                // Sla de laatst geraakte lijn op
                                 lastHitLine = closestLine;
 
                                 dx = reflection.x;
@@ -282,7 +258,6 @@
                                 reflections++;
                                 reflectionCountElement.textContent = `Aantal reflecties: ${reflections}`;
                             } else {
-                                // Geen botsing meer, laser eindigt aan de rand
                                 laserLines.push({
                                     start: { x: currentX, y: currentY },
                                     end: { x: currentX + dx * 1000, y: currentY + dy * 1000 },
@@ -295,12 +270,11 @@
 
                         selectedDots.length = 0;
 
-                        // Check na de lus of de rand is bereikt
                         if (reflections >= maxReflections) {
                             notification("ONGELDIG: De laser heeft de rand niet bereikt na 250.000 reflecties.");
                         }
                     }
-                    drawGrid(); // Herteken het raster na het toevoegen van de lijn
+                    drawGrid();
                 }
             }
         });
@@ -312,7 +286,7 @@
             const s2_y = p4.y - p3.y;
 
             const denom = (-s2_x * s1_y + s1_x * s2_y);
-            if (denom === 0) return null; // Lijnen zijn parallel
+            if (denom === 0) return null;
 
             const s = (-s1_y * (p1.x - p3.x) + s1_x * (p1.y - p3.y)) / denom;
             const t = (s2_x * (p1.y - p3.y) - s2_y * (p1.x - p3.x)) / denom;
@@ -324,21 +298,18 @@
                 };
             }
 
-            return null; // Geen snijpunt
+            return null;
         }
 
         function calculateReflection(start, end, normal) {
-            // Bereken de eenheidsvectoren van de straal
             const incidentX = end.x - start.x;
             const incidentY = end.y - start.y;
             const incidentLength = Math.sqrt(incidentX ** 2 + incidentY ** 2);
             const incident = { x: incidentX / incidentLength, y: incidentY / incidentLength };
 
-            // Normaliseer de normale vector
             const normalLength = Math.sqrt(normal.x ** 2 + normal.y ** 2);
             const unitNormal = { x: normal.x / normalLength, y: normal.y / normalLength };
 
-            // Bereken de reflectierichting: R = I - 2 * (I · N) * N
             const dotProduct = incident.x * unitNormal.x + incident.y * unitNormal.y;
             const reflection = {
                 x: incident.x - 2 * dotProduct * unitNormal.x,
@@ -349,25 +320,22 @@
         }
 
         function isPointOnLine(point, line) {
-            const tolerance = 1; // Hoe precies we willen zijn
+            const tolerance = 1;
             const { x, y } = point;
             const { start, end } = line;
 
             const crossProduct = Math.abs((y - start.y) * (end.x - start.x) - (x - start.x) * (end.y - start.y));
             const distance = Math.sqrt((end.x - start.x) ** 2 + (end.y - start.y) ** 2);
 
-            // Controleer of het punt op de lijn ligt (binnen de tolerantie)
             return crossProduct / distance < tolerance &&
                 x >= Math.min(start.x, end.x) && x <= Math.max(start.x, end.x) &&
                 y >= Math.min(start.y, end.y) && y <= Math.max(start.y, end.y);
         }
 
-        // Eventlistener voor de Undo-knop
         undoButton.addEventListener("click", () => {
             if (lines.length > 0) {
-                lines.pop(); // Verwijder de laatste lijn
+                lines.pop();
 
-                // Werk currentPoint bij naar het eindpunt van de vorige lijn (of reset naar null)
                 if (lines.length > 0) {
                     const lastLine = lines[lines.length - 1];
                     currentPoint = lastLine.end;
@@ -375,17 +343,15 @@
                     currentPoint = null;
                 }
 
-                drawGrid(); // Herteken het raster
+                drawGrid();
             }
         });
 
-        // Eventlistener voor Ctrl+Z
         document.addEventListener("keydown", (event) => {
             if (event.ctrlKey && event.key === 'z') {
                 if (lines.length > 0) {
-                    lines.pop(); // Verwijder de laatste lijn
+                    lines.pop();
 
-                    // Werk currentPoint bij naar het eindpunt van de vorige lijn (of reset naar null)
                     if (lines.length > 0) {
                         const lastLine = lines[lines.length - 1];
                         currentPoint = lastLine.end;
@@ -393,12 +359,11 @@
                         currentPoint = null;
                     }
 
-                    drawGrid(); // Herteken het raster
+                    drawGrid();
                 }
             }
         });
 
-        // Teken het initiële raster
         drawGrid();
 
         function checkScreenWidth() {
@@ -408,7 +373,6 @@
             }
         }
         window.onload = checkScreenWidth;
-        // window.onresize = checkScreenWidth;
     </script>
 </body>
 
