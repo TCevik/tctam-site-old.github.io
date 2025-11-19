@@ -252,7 +252,7 @@ var buttons = `
 	<button onclick="window.open('https://docs.google.com/forms/d/e/1FAIpQLSd2I8nAoty8Zp-akaEThrUnWLLBfj5V843WSkj0h8EjApAHWg/viewform', '_blank')">Report an error</button>
 	<button onclick="window.open('/terms-of-service', '_blank')">Terms of Service</button>
 	<button onclick="window.open('/privacy-policy', '_blank')">Privacy Policy</button>
-	<button style="margin-bottom: 10px;" onclick="window.open('https://github.com/TCevik/TCevik.github.io', '_blank')">View the source code of the site</button>
+	<button style="margin-bottom: 10px;" onclick="window.open('https://github.com/TCevik/tctam-site-old.github.io', '_blank')">View the source code of the site</button>
 `;
 
 function sideMenuNav() {
